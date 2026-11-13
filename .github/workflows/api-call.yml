@@ -19,7 +19,7 @@ jobs:
           for i in $(seq 1 10); do
             body=$(mktemp)
             status=$(curl -sS -A "Mozilla/5.0" -o "$body" -w "%{http_code}" "$API_URL")
-            if [ "$status" = "200" ] && grep -qiF "$EXPECTED_ADDRESS" "$body"; then
+            if [ "$status" = "200" ] && grep -qiP "(*UTF)(?<![\\w])$EXPECTED_ADDRESS(?![\\d])" "$body"; then
               echo "Call $i: HTTP $status, address verified"
             else
               echo "::error::Call $i: HTTP $status, '$EXPECTED_ADDRESS' not found"
