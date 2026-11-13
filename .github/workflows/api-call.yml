@@ -11,9 +11,19 @@ jobs:
     env:
       API_URL: ${{ vars.API_URL || 'https://www.booli.se/bostad/4203017' }}
     steps:
-      - name: Call API 10 times
+      - name: Call API 10 times and verify address
+        env:
+          EXPECTED_ADDRESS: Skärmarbrinksvägen 1
         run: |
+          fail=0
           for i in $(seq 1 10); do
-            status=$(curl -sS -o /dev/null -w "%{http_code}" "$API_URL")
-            echo "Call $i: HTTP $status"
+            body=$(mktemp)
+            status=$(curl -sS -A "Mozilla/5.0" -o "$body" -w "%{http_code}" "$API_URL")
+            if [ "$status" = "200" ] && grep -qiF "$EXPECTED_ADDRESS" "$body"; then
+              echo "Call $i: HTTP $status, address verified"
+            else
+              echo "::error::Call $i: HTTP $status, '$EXPECTED_ADDRESS' not found"
+              fail=1
+            fi
           done
+          exit $fail
