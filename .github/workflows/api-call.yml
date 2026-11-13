@@ -9,7 +9,7 @@ jobs:
   call-api:
     runs-on: ubuntu-latest
     env:
-      API_URL: ${{ vars.API_URL || 'https://api.github.com/zen' }}
+      API_URL: ${{ vars.API_URL || 'https://www.booli.se/bostad/4203017' }}
     steps:
       - name: Call API 10 times
         run: |
